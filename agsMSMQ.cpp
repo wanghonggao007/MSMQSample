@@ -140,7 +140,8 @@ BOOL agsMSMQ::CreatePublicQ(CString serv, CString pathmsg,CString label)
 //##ModelId=3C0DB2FF0333
 BOOL agsMSMQ::CreatePrivateQ(CString serv, CString pathmsg, CString label)
 {
-	m_sPathQ.Format(_T("%s\\PRIVATE$\\%s"),serv,pathmsg);
+	//m_sPathQ.Format(_T("%s\\PRIVATE$\\%s"),serv,pathmsg);
+	m_sPathQ.Format(_T("%s\\PRIVATE$\\%s"), serv, pathmsg);
     m_sLabelQ.Format(_T("%s"),label);
 	::MultiByteToWideChar(CP_ACP,0,m_sPathQ,-1,(LPWSTR)wszPath,sizeof(wszPath));
 	::MultiByteToWideChar(CP_ACP,0,m_sLabelQ,-1,(LPWSTR)wszLabel,sizeof(wszLabel));
@@ -223,7 +224,6 @@ BOOL agsMSMQ::SendPublicQ(CString serv, CString pathmsg,CString labelmsg,CString
 {
 	m_sPathQ.Format("%s\\%s",serv,pathmsg);    
 	::MultiByteToWideChar(CP_ACP,0,m_sPathQ,-1,(LPWSTR)wszPath,sizeof(wszPath));
-
 	
 	InitialPropidBody(labelmsg,msg);
 	InitialMQMSG();
@@ -276,8 +276,9 @@ BOOL agsMSMQ::SendPublicQ(CString serv, CString pathmsg,CString labelmsg,CString
 //##ModelId=3C0DB2FF02F8
 BOOL agsMSMQ::SendPrivateQ(CString serv, CString pathmsg, CString labelmsg, CString msg)
 {
-	//m_sPathQ.Format(_T("%s\\PRIVATE$\\%s"),serv,pathmsg);    
-	m_sPathQ.Format(_T("DIRECT=TCP:%s\\PRIVATE$\\%s"),serv,pathmsg);
+	m_sPathQ.Format(_T("%s\\PRIVATE$\\%s"),serv,pathmsg);    
+
+	//m_sPathQ.Format(_T("DIRECT=TCP:%s\\PRIVATE$\\%s"),serv,pathmsg);
 	::MultiByteToWideChar(CP_ACP,0,m_sPathQ,-1,(LPWSTR)wszPath,sizeof(wszPath));
 
 	
@@ -287,7 +288,7 @@ BOOL agsMSMQ::SendPrivateQ(CString serv, CString pathmsg, CString labelmsg, CStr
 	dwDestFormatLength = 256;
 	//::SysFreeString(wszDestFormat);
 	memset(wszDestFormat, 0, sizeof(wszDestFormat));
-/*	
+///*	
 	hr = MQPathNameToFormatName((LPWSTR)wszPath, wszDestFormat, &dwDestFormatLength);
 
 	if(FAILED(hr))
@@ -295,8 +296,8 @@ BOOL agsMSMQ::SendPrivateQ(CString serv, CString pathmsg, CString labelmsg, CStr
 		m_sError = "Error to convert from path name into format name";
 		return FALSE;
 	}
-*/
-	memcpy(wszDestFormat, wszPath, sizeof(wszPath));
+//*/
+	//memcpy(wszDestFormat, wszPath, sizeof(wszPath));
 	hr = MQOpenQueue(wszDestFormat,
 		             dwAccessMode,
 					 dwShareMode,
@@ -336,8 +337,8 @@ BOOL agsMSMQ::PrepareGetMessage(CString srv, CString path,int modeMSMQ)
 		  m_sPathQ.Format(_T("DIRECT=TCP:%s\\%s"),srv,path);    
 			break;
 	  case 1:
-			//m_sPathQ.Format(_T("%s\\PRIVATE$\\%s"),srv,path);    
-		  m_sPathQ.Format(_T("DIRECT=TCP:%s\\PRIVATE$\\%s"),srv,path);    
+			m_sPathQ.Format(_T("%s\\PRIVATE$\\%s"),srv,path);    
+		 // m_sPathQ.Format(_T("DIRECT=TCP:%s\\PRIVATE$\\%s"),srv,path);    
 
 	}
 	::MultiByteToWideChar(CP_ACP,0,m_sPathQ,-1,(LPWSTR)wszPath,sizeof(wszPath));
@@ -373,7 +374,7 @@ BOOL agsMSMQ::PrepareGetMessage(CString srv, CString path,int modeMSMQ)
 	ZeroMemory(wszLabel,sizeof(wszLabel));
 
 	InitialMQMSG();
-/*
+///*
 	hr = MQPathNameToFormatName((LPCWSTR)wszPath,
 		                        wszDestFormat,
 								&dwDestFormatLength);
@@ -383,8 +384,9 @@ BOOL agsMSMQ::PrepareGetMessage(CString srv, CString path,int modeMSMQ)
 		m_sError = "Error to convert from path name into format name";
 		return FALSE;
 	}
-*/
-	memcpy(wszDestFormat, wszPath, sizeof(wszPath));
+//*/
+	
+	//memcpy(wszDestFormat, wszPath, sizeof(wszPath));
 	dwAccessMode = MQ_RECEIVE_ACCESS;
 	dwShareMode = MQ_DENY_RECEIVE_SHARE;
 	
@@ -392,6 +394,7 @@ BOOL agsMSMQ::PrepareGetMessage(CString srv, CString path,int modeMSMQ)
 		             dwAccessMode,
 					 dwShareMode,
 					 &hQue);
+
 	if(FAILED(hr))
 	{
 		m_sError = "Error to open queue";
@@ -405,7 +408,8 @@ BOOL agsMSMQ::PrepareGetMessage(CString srv, CString path,int modeMSMQ)
 		return FALSE;
 	}
 	
-	dwReaction = MQ_ACTION_PEEK_CURRENT;
+	//dwReaction = MQ_ACTION_PEEK_CURRENT;
+	dwReaction = MQ_ACTION_RECEIVE;
 	m_nMessage = 0;	
 
 	return TRUE;
@@ -435,7 +439,7 @@ HRESULT agsMSMQ::getMSMQmsg()
 	msgQ.label = ::SysAllocString((LPWSTR)wszLabel);	
 	msgQ.msg.Format("%s",(char*)pMessage);	
 	
-	dwReaction = MQ_ACTION_PEEK_NEXT;
+	dwReaction = MQ_ACTION_PEEK_NEXT; 	
 	QPropVar[1].ulVal = 256;
 	m_nMessage++;
 		

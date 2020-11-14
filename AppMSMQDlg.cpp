@@ -71,8 +71,8 @@ CAppMSMQDlg::CAppMSMQDlg(CWnd* pParent /*=NULL*/)
 {
 	//{{AFX_DATA_INIT(CAppMSMQDlg)
 	m_sLabel = _T("");
-	m_sPath = _T("");
-	m_sServer = _T("");
+	m_sPath = _T("queue_scanner");
+	m_sServer = _T(".");
 	m_sMessage = _T("");
 	m_sMessageLabel = _T("");
 	//}}AFX_DATA_INIT
@@ -305,7 +305,7 @@ void CAppMSMQDlg::OnSendprvBtn()
 		return;
 	}
 
-	AfxMessageBox("Send Public Message succesfully");	
+	AfxMessageBox("Send Private Message succesfully");	
 }
 
 //##ModelId=3C0DB2FF0225
@@ -367,7 +367,8 @@ void CAppMSMQDlg::OnAllprvBtn()
 	UpdateData();
 	CWaitCursor wait;
 	m_cMessage.DeleteAllItems();
-	if(!mque.PrepareGetMessage(m_sServer,m_sPath,1))
+	//if(!mque.PrepareGetMessage(m_sServer,m_sPath,0))
+	if (!mque.PrepareGetMessage(m_sServer, m_sPath,1))
 	{
 		AfxMessageBox(mque.getErrorMsg());
 		return;
